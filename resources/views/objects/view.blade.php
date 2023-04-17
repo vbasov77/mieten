@@ -94,7 +94,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="row justify-content-center text-center">
                 <div class="col-12">
                     @if (!empty($data->path))
@@ -102,7 +101,8 @@
                             <iframe width="560" height="315" src="{{$data->path}}" title="YouTube video player"
                                     frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen></iframe>
+                                    allowfullscreen>
+                            </iframe>
                         </div>
                     @endif
                 </div>
@@ -121,17 +121,17 @@
     </section>
     <section>
         <div class="row justify-content-center text-center">
-            @guest()
-            @else
-                @if(Auth::check())
+
+            @if(Auth::user()->id == $data->user_id)
+
                     <div>
                         <button class="btn btn-success btn-sm" style="color: white; margin-top: 25px"
                                 onclick="window.location.href = '{{route('object.edit', ['id'=>$data->id])}}'">
                             Редактировать номер
                         </button>
                     </div>
-                @endif
-            @endguest
+
+            @endif
         </div>
     </section>
     @push('scripts')
