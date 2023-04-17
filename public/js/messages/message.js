@@ -30,14 +30,15 @@ function newMessage() {
                 }
             }
 
-            $(`<div data-id="` + res.id + `" style="float: right; font-size: 17px" class="messageBlock"><button data-id="` + res.id + `" type="button" class="close"
+            $(`<li class="sent"> <div class="myClass">
+<div data-id="` + res.id + `" style="float: right; font-size: 17px; background-color: #dad6f5; " class="messageBlock"><button data-id="` + res.id + `" type="button" class="close"
                                             aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 ${res.body}<br>
                 <small  style="font-size: 10px" class="mb-0 text-left">${date.toLocaleString()}</small >
-                </div>`).appendTo($('.messages ul'));
+                </div></div></li>`).appendTo($('.messages ul'));
 
             $('.message-input input').val('');
-            // $('.message-input .emoji-wysiwyg-editor').html('');
+            $('.message-input .emoji-wysiwyg-editor').html('');
             $('.messages').animate({ scrollTop: $('.messages ul').height() }, "fast");
 
 
@@ -53,7 +54,7 @@ $('.submit').click(function() {
 });
 
 $('#framechat .content .message-input ').on('keydown', function(e) {
-    if (e.which == 13) {
+    if (e.which == 130) {
         newMessage();
         return false;
     }

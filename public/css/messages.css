@@ -86,8 +86,8 @@
 
 #framechat .content .messages {
     height: auto;
-    min-height: calc(100% - 90px);
-    max-height: calc(100% - 90px);
+    min-height: calc(82% - 90px);
+    max-height: calc(82% - 90px);
     overflow-y: scroll;
     overflow-x: hidden;
     width: 100%;

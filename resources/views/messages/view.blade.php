@@ -35,11 +35,19 @@
                                     @for($i = 0; $i < count($messages); $i++)
                                         <li class="sent">
                                             <div class="myClass">
-                                                <div class="messageBlock" @php
+                                                <div class="messageBlock" style="
+                                                     @php
+                                                    if($messages[$i]->status == 0){
+                                                        echo "background-color: #dad6f5; ";}
+                                                @endphp
+                                                @php
                                                     if($messages[$i]->from_user_id == $userId){
-                            echo "style='float: right'";
+                            echo "float: right; ";
                         }
-                                                @endphp data-id="{{$messages[$i]->id}}">
+                                                @endphp "
+
+
+                                                     data-id="{{$messages[$i]->id}}">
                                                     @if($messages[$i]->from_user_id == $userId)
                                                         <button data-id="{{$messages[$i]->id}}" type="button"
                                                                 class="close"
@@ -50,7 +58,7 @@
                                                     <small style="opacity: 0.7">{!! $messages[$i]->created_at !!}</small>
                                                 </div>
                                             </div>
-
+                                        </li>
                                     @endfor
 
                                 </ul>

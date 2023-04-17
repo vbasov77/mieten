@@ -48,7 +48,7 @@ where m.id in (select max(m2.id)
         $messages = DB::select('select m.* from messages m where 
 (from_user_id= ' . $request->to_user_id . ' and to_user_id = ' . Auth::id() . ') 
 or 
-(from_user_id = ' . Auth::id() . ' and to_user_id = ' . $request->to_user_id . ');');
+(from_user_id = ' . Auth::id() . ' and to_user_id = ' . $request->to_user_id . ') and obj_id = ' . $request->id . ';');
         $userId = Auth::id();
         if (!empty(count($messages))) {
             if ($messages[0]->from_user_id != Auth::id()) {
@@ -59,9 +59,14 @@ or
         } else {
             $toUser = $request->to_user_id;
         }
+        for ($i = 0; $i < count($messages); $i++) {
+            if ($messages[$i]->to_user_id == Auth::id() && $messages[$i]->status == 0) {
+                Message::where('id', $messages[$i]->id)->update(['status' => 1]);
+            }
+        }
         $image = Image::where('obj_id', $request->id)->value('path');
         $address = Address::where('obj_id', $request->id)->value('address');
-        return view('messages.view', ['address'=> $address,'image' => $image, 'objId' => $request->id, 'messages' => $messages, 'userId' => $userId, 'toUser' => $toUser]);
+        return view('messages.view', ['address' => $address, 'image' => $image, 'objId' => $request->id, 'messages' => $messages, 'userId' => $userId, 'toUser' => $toUser]);
     }
 
     public function deleteMsg(Request $request)
