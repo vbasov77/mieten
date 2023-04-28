@@ -2,10 +2,6 @@
 @section('content')
     <link href="{{ asset('css/messages.css') }}" rel="stylesheet">
     <style>
-        .address {
-            margin: 0 25% 0 25%;
-            width: 50%;
-        }
     </style>
     <section>
         <div class="container px-4 px-lg-5">
@@ -42,10 +38,12 @@
                                                 @endphp "
                                                      data-id="{{$messages[$i]->id}}">
                                                     @if($messages[$i]->from_user_id == $userId)
+                                                        <div class="round-popup">
                                                         <button data-id="{{$messages[$i]->id}}" type="button"
                                                                 class="close"
                                                                 aria-label="Close"><span
                                                                     aria-hidden="true">&times;</span></button>
+                                                        </div>
                                                     @endif
                                                     <big>{!!$messages[$i]->body !!}<br></big>
                                                     <small style="opacity: 0.7">{!! $messages[$i]->created_at !!}</small>

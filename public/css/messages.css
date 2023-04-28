@@ -267,3 +267,11 @@
     border: 4px solid white;
     margin: 0px 10px;
 }
+
+.round-popup {
+    display: none;
+}
+
+.myClass:hover .round-popup{
+    display: block;
+}

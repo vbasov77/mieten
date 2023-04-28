@@ -19,7 +19,6 @@ class MessageController extends Controller
             'to_user_id' => $request->to_user_id,
             'obj_id' => $request->obj_id,
             'body' => $request->body,
-            'notified' => 1,
         ];
         $id = DB::table('messages')->insertGetId($message);
         $date = Message::where('id', $id)->value('created_at');
@@ -33,10 +32,14 @@ class MessageController extends Controller
 
     public function notified(Request $request)
     {
-        $notified = Message::where('to_user_id', $request->to_user_id)->where('from_user_id', $request->from_user_id)
-            ->where('status', 0)->where('notified', 1)->get();
-        Message::where('to_user_id', $request->to_user_id)->where('from_user_id', $request->from_user_id)
-            ->where('status', 0)->where('notified', 1)->update(['notified' => 0]);
+        $notified = [];
+        for ($i = 0; $i < count($request->array_id); $i++) {
+            $not = Message::where('id', $request->array_id[$i])->first();
+            if($not->status == 1){
+                $notified [] = $not;
+            }
+
+        }
         exit(json_encode($notified));
     }
 
@@ -52,6 +55,7 @@ where m.id in (select max(m2.id)
                       );');
         return view('messages.my_messages', ['messages' => $myMessages]);
     }
+
 
     public function view(Request $request)
     {
@@ -72,6 +76,7 @@ or
         for ($i = 0; $i < count($messages); $i++) {
             if ($messages[$i]->to_user_id == Auth::id() && $messages[$i]->status == 0) {
                 Message::where('id', $messages[$i]->id)->update(['status' => 1]);
+                $messages[$i]->status = 1;
             }
         }
         $image = Image::where('obj_id', $request->id)->value('path');
