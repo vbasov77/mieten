@@ -16,26 +16,21 @@
                         <div class="content">
                             <div class="header">
                                 {{--                                <i class="fa fa-comments"></i>--}}
-
                                 <div class="msgImg">
                                     <a style="text-decoration: none;" href="{{ route('object.view', ['id'=>$objId]) }}">
                                         <img class="imgMsg"
                                              src="{{ asset('images/' . $image) }}" style="width: auto; height: 60px"
                                         >
                                     </a>
-
                                     {!! $address !!}
-
                                 </div>
-
                             </div>
-
                             <div class="messages">
                                 <ul>
                                     @for($i = 0; $i < count($messages); $i++)
                                         <li class="sent">
                                             <div class="myClass">
-                                                <div class="messageBlock" style="
+                                                <div class="messageBlock" id="{{$messages[$i]->id}}" style="
                                                      @php
                                                     if($messages[$i]->status == 0){
                                                         echo "background-color: #dad6f5; ";}
@@ -45,8 +40,6 @@
                             echo "float: right; ";
                         }
                                                 @endphp "
-
-
                                                      data-id="{{$messages[$i]->id}}">
                                                     @if($messages[$i]->from_user_id == $userId)
                                                         <button data-id="{{$messages[$i]->id}}" type="button"
@@ -60,24 +53,20 @@
                                             </div>
                                         </li>
                                     @endfor
-
                                 </ul>
                             </div>
                             <div class="message-input">
                                 <div class="wrap">
-
                                     <input class="form-control" type="text" placeholder="Ваше сообщение..."/>
                                     <button class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </section>
-
     @push('scripts')
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
         <script>
@@ -85,7 +74,6 @@
             var from_user_id = @json($userId);
             var obj_id = @json($objId);
         </script>
-
         <script src="{{asset('js/messages/message.js')}}"></script>
     @endpush
 @endsection

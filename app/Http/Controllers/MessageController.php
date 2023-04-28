@@ -18,7 +18,8 @@ class MessageController extends Controller
             'from_user_id' => $request->from_user_id,
             'to_user_id' => $request->to_user_id,
             'obj_id' => $request->obj_id,
-            'body' => $request->body
+            'body' => $request->body,
+            'notified' => 1,
         ];
         $id = DB::table('messages')->insertGetId($message);
         $date = Message::where('id', $id)->value('created_at');
@@ -28,6 +29,15 @@ class MessageController extends Controller
             'body' => $request->body,
             'date' => $date
         ]);
+    }
+
+    public function notified(Request $request)
+    {
+        $notified = Message::where('to_user_id', $request->to_user_id)->where('from_user_id', $request->from_user_id)
+            ->where('status', 0)->where('notified', 1)->get();
+        Message::where('to_user_id', $request->to_user_id)->where('from_user_id', $request->from_user_id)
+            ->where('status', 0)->where('notified', 1)->update(['notified' => 0]);
+        exit(json_encode($notified));
     }
 
     public function myMessages()
@@ -75,4 +85,25 @@ or
         $res = ['answer' => 'ok'];
         exit(json_encode($res));
     }
+
+    public function checkNewMsg(Request $request)
+    {
+        $messages = Message::where('to_user_id', $request->from_user_id)
+            ->where('from_user_id', $request->to_user_id)
+            ->where('obj_id', $request->obj_id)->where('status', 0)->get();
+        if (!empty(count($messages))) {
+            $array = [];
+            for ($i = 0; $i < count($messages); $i++) {
+                Message::where('id', $messages[$i]->id)->update(['status' => 1]);
+                $array[] = $messages[$i];
+            }
+            $result = ['bool' => true, 'messages' => $array];
+            exit(json_encode($result));
+        }
+        return response()->json([
+            'bool' => false,
+        ]);
+
+    }
+
 }

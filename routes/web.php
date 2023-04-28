@@ -32,6 +32,8 @@ Route::get('/messages', 'MessageController@myMessages')->name('my.messages')->mi
 Route::get('/message{id}', 'MessageController@view')->name('view.messages')->middleware('auth');
 Route::post('/add_message', 'MessageController@add')->name('add.message')->middleware('auth');
 Route::get('/delete_message', 'MessageController@deleteMsg')->name('delete.message')->middleware('auth');
+Route::post('/check_message', 'MessageController@checkNewMsg')->name('check.message')->middleware('auth');
+Route::post('/notified', 'MessageController@notified')->name('notified.message')->middleware('auth');
 
 
 Route::any('/autocomplete', 'SearchController@autocomplete')->name('autocomplete');
