@@ -2,13 +2,24 @@ const escapeHtml = (unsafe) => {
     return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 };
 
-let arrayId = new Array();
+let arrayId = [];
+
+
+// Формируем массив по data
+const attributes = document.getElementsByClassName('messageBlock');
+for (const attribute of attributes) {
+
+    if (attribute.getAttribute('data-notified') == 0) {
+        arrayId.push(attribute.getAttribute('id'))
+    }
+}
 
 setInterval(checkNewMsg, 3000);
 setInterval(notified, 5000);
 
 
 function notified() {
+
     if (arrayId.length) {
         data = {
             "to_user_id": to_user_id,
@@ -26,7 +37,6 @@ function notified() {
             data: data,
             dataType: 'json',
             success: function (res) {
-
                 if (res.length) {
                     const checkBackgroun = (id) => {
                         let element = document.getElementById(id);
@@ -100,6 +110,7 @@ function newMessage() {
         dataType: 'json',
         success: function (res) {
             arrayId.push(res.id);
+            console.log(arrayId);
             let date = new Date(res.date);
             if ($.trim(message) == '') {
                 message = $('.message-input .emoji-wysiwyg-editor').html();

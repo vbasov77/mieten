@@ -25,7 +25,7 @@
                                 <ul>
                                     @for($i = 0; $i < count($messages); $i++)
                                         <li class="sent">
-                                            <div class="myClass">
+                                            <div class="myClass" >
                                                 <div class="messageBlock" id="{{$messages[$i]->id}}" style="
                                                      @php
                                                     if($messages[$i]->status == 0){
@@ -36,7 +36,7 @@
                             echo "float: right; ";
                         }
                                                 @endphp "
-                                                     data-id="{{$messages[$i]->id}}">
+                                                     data-id="{{$messages[$i]->id}}" data-notified="{{$messages[$i]->status}}">
                                                     @if($messages[$i]->from_user_id == $userId)
                                                         <div class="round-popup">
                                                         <button data-id="{{$messages[$i]->id}}" type="button"
