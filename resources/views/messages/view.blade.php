@@ -4,7 +4,7 @@
     <style>
     </style>
     <section>
-        <div class="container px-4 px-lg-5">
+        <div class="container px-4 px-lg-5" style="white-space: nowrap"> {{--Запрет переноса строк при уменьшении странцы браузера--}}
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-lg-8">
                     @csrf
@@ -22,7 +22,11 @@
                                     </a>
                                     <div class="infoBlock">
                                         <b>{!! $data->name !!}</b><br>
-                                        {!! $data->address !!}
+                                        <small>
+                                            <div class="iconsSmall">
+                                                <img src="{{ asset('icons/location-map-marker-navigation.svg') }}"
+                                                     style="width: 20px; height: auto"
+                                                ></div>{!! $data->address !!}</small>
                                     </div>
                                 </div>
 

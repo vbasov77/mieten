@@ -280,3 +280,7 @@
     display: inline-block;
     line-height: 20px;
 }
+
+.iconsSmall {
+    display: inline-block;
+}
