@@ -4,7 +4,6 @@ const escapeHtml = (unsafe) => {
 
 let arrayId = [];
 
-
 // Формируем массив по data
 const attributes = document.getElementsByClassName('messageBlock');
 for (const attribute of attributes) {
@@ -16,7 +15,6 @@ for (const attribute of attributes) {
 
 setInterval(checkNewMsg, 3000);
 setInterval(notified, 5000);
-
 
 function notified() {
 

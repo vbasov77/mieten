@@ -275,3 +275,8 @@
 .myClass:hover .round-popup{
     display: block;
 }
+
+.infoBlock {
+    display: inline-block;
+    line-height: 20px;
+}

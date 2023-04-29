@@ -35,7 +35,7 @@ class MessageController extends Controller
         $notified = [];
         for ($i = 0; $i < count($request->array_id); $i++) {
             $not = Message::where('id', $request->array_id[$i])->first();
-            if($not->status == 1){
+            if ($not->status == 1) {
                 $notified [] = $not;
             }
 
@@ -79,9 +79,10 @@ or
                 $messages[$i]->status = 1;
             }
         }
-        $image = Image::where('obj_id', $request->id)->value('path');
-        $address = Address::where('obj_id', $request->id)->value('address');
-        return view('messages.view', ['address' => $address, 'image' => $image, 'objId' => $request->id, 'messages' => $messages, 'userId' => $userId, 'toUser' => $toUser]);
+        $data = DB::select('select id, user_id, (select path from images i where obj_id = ' . $request->id . ') path, 
+        (select address from addresses where obj_id = ' . $request->id . ') address, (select u.name from users u 
+        where u.id = o.user_id)name  from objects o where id =' . $request->id);
+        return view('messages.view', ['data' => $data[0], 'messages' => $messages, 'userId' => $userId, 'toUser' => $toUser]);
     }
 
     public function deleteMsg(Request $request)

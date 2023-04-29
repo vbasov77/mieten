@@ -13,19 +13,25 @@
                             <div class="header">
                                 {{--                                <i class="fa fa-comments"></i>--}}
                                 <div class="msgImg">
-                                    <a style="text-decoration: none;" href="{{ route('object.view', ['id'=>$objId]) }}">
+                                    <a style="text-decoration: none;"
+                                       href="{{ route('object.view', ['id'=>$data->id]) }}">
                                         <img class="imgMsg"
-                                             src="{{ asset('images/' . $image) }}" style="width: auto; height: 60px"
+                                             src="{{ asset('images/' . $data->path) }}"
+                                             style="width: auto; height: 60px"
                                         >
                                     </a>
-                                    {!! $address !!}
+                                    <div class="infoBlock">
+                                        <b>{!! $data->name !!}</b><br>
+                                        {!! $data->address !!}
+                                    </div>
                                 </div>
+
                             </div>
                             <div class="messages">
                                 <ul>
                                     @for($i = 0; $i < count($messages); $i++)
                                         <li class="sent">
-                                            <div class="myClass" >
+                                            <div class="myClass">
                                                 <div class="messageBlock" id="{{$messages[$i]->id}}" style="
                                                      @php
                                                     if($messages[$i]->status == 0){
@@ -36,13 +42,14 @@
                             echo "float: right; ";
                         }
                                                 @endphp "
-                                                     data-id="{{$messages[$i]->id}}" data-notified="{{$messages[$i]->status}}">
+                                                     data-id="{{$messages[$i]->id}}"
+                                                     data-notified="{{$messages[$i]->status}}">
                                                     @if($messages[$i]->from_user_id == $userId)
                                                         <div class="round-popup">
-                                                        <button data-id="{{$messages[$i]->id}}" type="button"
-                                                                class="close"
-                                                                aria-label="Close"><span
-                                                                    aria-hidden="true">&times;</span></button>
+                                                            <button data-id="{{$messages[$i]->id}}" type="button"
+                                                                    class="close"
+                                                                    aria-label="Close"><span
+                                                                        aria-hidden="true">&times;</span></button>
                                                         </div>
                                                     @endif
                                                     <big>{!!$messages[$i]->body !!}<br></big>
@@ -70,7 +77,7 @@
         <script>
             var to_user_id = @json($toUser);
             var from_user_id = @json($userId);
-            var obj_id = @json($objId);
+            var obj_id = @json($data->id);
         </script>
         <script src="{{asset('js/messages/message.js')}}"></script>
     @endpush

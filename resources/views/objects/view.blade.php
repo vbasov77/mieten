@@ -121,7 +121,6 @@
     </section>
     <section>
         <div class="row justify-content-center text-center">
-
             @if(!empty(Auth::user()->id ) == $data->user_id)
                 <div>
                     <button class="btn btn-success btn-sm" style="color: white; margin-top: 25px"
