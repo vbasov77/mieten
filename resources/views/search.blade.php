@@ -119,7 +119,6 @@
 
         </div>
         <script src="{{ asset('js/search/search_locality.js') }}" defer></script>
-
     </main>
 </div>
 <section>

@@ -12,8 +12,6 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        '/autocomplete',
-//        '/get_json',
-////        '/chat_add',
+//        '/autocomplete',
     ];
 }

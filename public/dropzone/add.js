@@ -63,7 +63,6 @@ $(function () {
     $('#form').on('submit', function (e) {
         e.preventDefault();
         var his = $(this),
-            btn = his.find("button.submit"),
             data = $("#form").serialize(),
             preloader = $('.preloader-img');
         $.ajax({

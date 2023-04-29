@@ -29,9 +29,11 @@ class ObjectController extends Controller
             ->get(['objects.*', 'coordinates.coordinates', 'addresses.address', 'video.path']);
         $images = Image::where('obj_id', $request->id)->pluck('path');
         if (isset($obj)) {
+
             return view('objects.view', ['data' => $obj[0], 'images' => $images]);
         }
         $message = "Скорее всего объект был удалён...";
+
         return view('sorry.sorry', ['message' => $message]);
     }
 
@@ -157,7 +159,9 @@ class ObjectController extends Controller
 
     public function updateLocation(Request $request)
     {
-        Session::flush();
+//        Session::flush();
+        $request->session()->forget('locality');
+        $request->session()->save();
         return redirect()->action('FrontController@front');
     }
 

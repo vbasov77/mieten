@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Locality;
-use App\Models\Obj;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +16,38 @@ class FrontController extends Controller
                 DB::select("select o.id, o.title, o.count_rooms, o.capacity, o.price,
    (select i.path from images i where obj_id = o.id order by i.id limit 1) path
 from objects o left join addresses a on o.id = a.obj_id where a.locality = " . session('locality'));
-            return view('front', ['data' => $data]);
+            if ($request->session()->has('cardName')
+                &&
+                $request->session()->has('cardBodyName')
+                &&
+                $request->session()->has('cardFooterName')
+            ) {
+                $dataSession = [
+                    'cardName' => session('cardName'),
+                    'cardBodyName' => session('cardBodyName'),
+                    'cardFooterName' => session('cardFooterName'),
+                ];
+            } else {
+                $dataSession = [
+                    'cardName' => 'card',
+                    'cardBodyName' => 'card-body',
+                    'cardFooterName' => 'card-footer',
+                ];
+            }
+            return view('front', ['data' => $data, 'dataSession' => $dataSession]);
         }
+    }
+
+    public function addSession(Request $request)
+    {
+        $request->session()->put('cardName', $request->cardName);
+        $request->session()->save();
+        $request->session()->put('cardBodyName', $request->cardBodyName);
+        $request->session()->save();
+        $request->session()->put('cardFooterName', $request->cardFooterName);
+        $request->session()->save();
+        $res = ['session' =>  $request->cardFooterName];
+        exit(json_encode($res));
+
     }
 }

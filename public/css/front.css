@@ -1,0 +1,38 @@
+.paragraphClass {
+    display: none;
+}
+
+.card {
+    width: 18rem;
+}
+.rowM {
+    width: 100%;
+    display: block;
+    position: relative;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+    padding: 8px;
+}
+
+.rowM img {
+    width: 18rem;
+    float: left;
+    clear: left;
+    display: block;
+}
+
+.rowM-body {
+    margin-left: 20px;
+    float: left;
+    display: block;
+}
+
+.rowM-footer {
+    width: 15%;
+    float: right;
+    margin: 50px 0;
+}

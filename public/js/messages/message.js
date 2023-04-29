@@ -17,7 +17,6 @@ setInterval(checkNewMsg, 3000);
 setInterval(notified, 5000);
 
 function notified() {
-
     if (arrayId.length) {
         data = {
             "to_user_id": to_user_id,
@@ -150,6 +149,9 @@ $('body').on('click', '.close', function () {
     let $this = $(this);
     data = {'id': $this.data('id')};
     $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
         url: '/delete_message',
         type: 'get',
         data: data,

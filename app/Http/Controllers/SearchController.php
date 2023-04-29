@@ -27,6 +27,7 @@ class SearchController extends Controller
             ->pluck('locality');
         exit(json_encode($res));
     }
+
     public function test(){
         return view('test');
     }

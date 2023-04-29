@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
+Route::post('/add_session', 'FrontController@addSession')->name('add.session');
 Route::get('/', 'FrontController@front')->name('front')/*->middleware('admin')*/;
 
 
