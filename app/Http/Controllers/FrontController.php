@@ -10,12 +10,13 @@ class FrontController extends Controller
     public function front(Request $request)
     {
         if (empty(session('locality'))) {
-            return view('search');
+            return view('locality.locality');
         } else {
             $data =
-                DB::select("select o.id, o.title, o.count_rooms, o.capacity, o.price,
+                DB::select("select o.id, o.address, d.title, d.price, d.count_rooms, d.capacity,
    (select i.path from images i where obj_id = o.id order by i.id limit 1) path
-from objects o left join addresses a on o.id = a.obj_id where a.locality = " . session('locality'));
+from objects o left join addresses a on o.id = a.obj_id left join details d on o.id = d.obj_id where a.locality = " . session('locality'));
+
             if ($request->session()->has('cardName')
                 &&
                 $request->session()->has('cardBodyName')

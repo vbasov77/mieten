@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\Address;
-use App\Models\Image;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +16,7 @@ class MessageController extends Controller
             'from_user_id' => $request->from_user_id,
             'to_user_id' => $request->to_user_id,
             'obj_id' => $request->obj_id,
-            'body' => $request->body,
+            'body' => strip_tags($request->body),
         ];
         $id = DB::table('messages')->insertGetId($message);
         $date = Message::where('id', $id)->value('created_at');
@@ -43,7 +41,7 @@ class MessageController extends Controller
         exit(json_encode($notified));
     }
 
-    public function myMessages()
+    public function myMessages(Request $request)
     {
         $myMessages = DB::select('select m.*, (select id from users where id = (case when m.from_user_id = 
 ' . Auth::id() . ' then m.to_user_id else m.from_user_id end)) user_id, (select i.path from images i where obj_id = m.obj_id order by i.id limit 1) path
@@ -53,16 +51,21 @@ where m.id in (select max(m2.id)
                        where ' . Auth::id() . ' in (from_user_id, to_user_id)
                        group by (case when from_user_id = ' . Auth::id() . ' then to_user_id else from_user_id end)
                       );');
+        $error = null;
+        !empty($request->error) ? $error = $request->error : $error = null;
+
         return view('messages.my_messages', ['messages' => $myMessages]);
     }
 
 
     public function view(Request $request)
     {
+        // Получим все сообщения чата двух юзеров
         $messages = DB::select('select m.* from messages m where 
 (from_user_id= ' . $request->to_user_id . ' and to_user_id = ' . Auth::id() . ') 
 or 
 (from_user_id = ' . Auth::id() . ' and to_user_id = ' . $request->to_user_id . ') and obj_id = ' . $request->id . ';');
+//        if (!empty(count($messages))) {
         $userId = Auth::id();
         if (!empty(count($messages))) {
             if ($messages[0]->from_user_id != Auth::id()) {
@@ -79,10 +82,20 @@ or
                 $messages[$i]->status = 1;
             }
         }
-        $data = DB::select('select id, user_id, (select path from images i where obj_id = ' . $request->id . ') path, 
-        (select address from addresses where obj_id = ' . $request->id . ') address, (select u.name from users u 
-        where u.id = o.user_id)name  from objects o where id =' . $request->id);
-        return view('messages.view', ['data' => $data[0], 'messages' => $messages, 'userId' => $userId, 'toUser' => $toUser]);
+        $user_id = $request->from_user_id;
+        if ($request->from_user_id != Auth::user()->id) {
+            $user_id = $request->to_user_id;
+        }
+        // Получим фото объекта, адрес и имя собеседника
+        $data = DB::select('select o.id, o.address, 
+        (select path from images i where obj_id = ' . $request->id . ' order by i.id limit 1) path, 
+        (select u.name from users u where u.id = ' . $user_id . ')user_name  
+        from objects o where id =' . $request->id);
+
+        return view('messages.view', ['data' => $data, 'messages' => $messages, 'userId' => $userId, 'toUser' => $toUser]);
+//        }
+//        $error = "К сожалению, все сообщения удалены";
+//        return redirect()->action('ObjectController@edit', ['error' => $error]);
     }
 
     public function deleteMsg(Request $request)

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Address;
 use App\Models\Coordinates;
 use App\Models\Country;
+use App\Models\Detail;
 use App\Models\Image;
 use App\Models\Locality;
 use App\Models\Obj;
@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Session;
 
 
 class ObjectController extends Controller
@@ -25,8 +24,12 @@ class ObjectController extends Controller
         $obj = Obj::leftJoin('coordinates', 'objects.id', '=', 'coordinates.obj_id')
             ->leftJoin('addresses', 'objects.id', '=', 'addresses.obj_id')
             ->leftJoin('video', 'objects.id', '=', 'video.obj_id')
+            ->leftJoin('details', 'objects.id', '=', 'details.obj_id')
             ->where('objects.id', $request->id)
-            ->get(['objects.*', 'coordinates.coordinates', 'addresses.address', 'video.path']);
+            ->get(['objects.*',
+                'details.title', 'details.price', 'details.capacity', 'details.count_rooms',
+                'details.service', 'details.text_obj',
+                'coordinates.coordinates', 'addresses.address', 'video.path']);
         $images = Image::where('obj_id', $request->id)->pluck('path');
         if (isset($obj)) {
 
@@ -37,51 +40,27 @@ class ObjectController extends Controller
         return view('sorry.sorry', ['message' => $message]);
     }
 
-
-    public function add(Request $request)
+    public function addAddress(Request $request)
     {
         if ($request->isMethod('get')) {
             // этот код выполнится, если используется метод GET
-            $request->session()->forget('images');
-            return view('objects.add');
+            return view('objects.add_address');
         }
         if ($request->isMethod('post')) {
             // этот код выполнится, если используется метод POST
             $request->validate([
                 'address' => 'required|max:255',
-                'price' => 'required|max:7',
-                'title' => 'required|max:100',
-                'text_room' => 'required|max:3000',
-                'capacity' => 'required|max:2',
             ]);
-            $service = null;
-            if (isset($request->service)) {
-                $service = (string)implode(',', $request->service);
-            }
-
             $id = Obj::insertGetId([
                 'user_id' => Auth::user()->id,
-                'price' => $request->price,
-                'title' => $request->title,
-                'text_obj' => $request->text_room,
-                'count_rooms' => $request->count_rooms,
-                'capacity' => $request->capacity,
-                'service' => $service,
+                'address' => $request->address,
             ]);
-
             self::getAddress($request->address, $id);
+            return redirect()->action('ObjectController@edit', ['id' => $id]);
 
-            if ($request->video != null) {
-                Video::insert([
-                    'obj_id' => $id,
-                    'path' => $request->video
-                ]);
-            }
-            self::insertImages($id, $request->images);
-            $request->session()->forget('images');
-            return redirect()->action('ObjectController@view', ['id' => $id]);
         }
     }
+
 
     public function edit(Request $request)
     {
@@ -103,38 +82,47 @@ class ObjectController extends Controller
         }
         if ($request->isMethod('post')) {
             // этот код выполнится, если используется метод POST
-            $obj = Obj::
-            leftJoin('addresses', 'objects.id', '=', 'addresses.obj_id')
-                ->leftJoin('video', 'objects.id', '=', 'video.obj_id')
-                ->where('objects.id', $request->id)
-                ->get(['objects.*', 'addresses.address', 'video.path']);
             if (!empty($request->id)) {
                 $service = null;
                 if (isset($request->service)) {
                     $service = (string)implode(',', $request->service);
                 }
-                Obj::where('id', $request->id)->update([
-                    'price' => $request->price,
-                    'title' => $request->title,
-                    'text_obj' => $request->text_room,
-                    'count_rooms' => $request->count_rooms,
-                    'capacity' => $request->capacity,
-                    'service' => $service,
-                ]);
-                if ($_POST['video'] !== '') {
-                    $video = Video::where('obj_id', $request->id)->get();
-                    if (!empty(count($video))) {
-                        Video::where('obj_id', $request->id)->update([
-                            'path' => $request->video
-                        ]);
-                    } else {
-                        Video::insert([
-                            'obj_id' => $request->id,
-                            'path' => $request->video
-                        ]);
+                $obj = Detail::where('obj_id', $request->id)->first();
+                if (isset($obj)) {
+                    Detail::where('obj_id', $request->id)->update([
+                        'price' => $request->price,
+                        'title' => $request->title,
+                        'text_obj' => $request->text_room,
+                        'count_rooms' => $request->count_rooms,
+                        'capacity' => $request->capacity,
+                        'service' => $service,
+                    ]);
+                    if ($_POST['video'] !== '') {
+                        $video = Video::where('obj_id', $request->id)->get();
+                        if (!empty(count($video))) {
+                            Video::where('obj_id', $request->id)->update([
+                                'path' => $request->video
+                            ]);
+                        } else {
+                            Video::insert([
+                                'obj_id' => $request->id,
+                                'path' => $request->video
+                            ]);
+                        }
                     }
+                    $res = ['answer' => 'ok'];
+                } else {
+                    Detail::insert([
+                        'obj_id' => $request->id,
+                        'price' => $request->price,
+                        'title' => $request->title,
+                        'text_obj' => $request->text_room,
+                        'count_rooms' => $request->count_rooms,
+                        'capacity' => $request->capacity,
+                        'service' => $service,
+                    ]);
+                    $res = ['answer' => 'ok'];
                 }
-                $res = ['answer' => 'ok'];
             } else {
                 $res = ['answer' => 'error'];
             }
@@ -154,12 +142,12 @@ class ObjectController extends Controller
             File::delete(public_path('images/' . $img[$i]));// Удалили файл
         }
         Image::where('obj_id', $request->id)->delete();
+        Detail::where('obj_id', $request->id)->delete();
 
     }
 
     public function updateLocation(Request $request)
     {
-//        Session::flush();
         $request->session()->forget('locality');
         $request->session()->save();
         return redirect()->action('FrontController@front');
@@ -260,5 +248,6 @@ class ObjectController extends Controller
         $data = substr($data, 0, -1);
         DB::insert('insert into images (obj_id, path) values ' . $data);
     }
+
 
 }

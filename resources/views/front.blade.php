@@ -9,6 +9,10 @@
             margin-right: -50%;
             transform: translate(-50%, -50%)
         }
+
+        .rowM{
+            display: none;
+        }
     </style>
     <link href="{{ asset('css/front.css') }}" rel="stylesheet">
     <section>
@@ -28,15 +32,14 @@
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 @if(!empty(count($data)))
                     @foreach($data as $value)
-                        <div {{--class="card"--}} id="card">
+                        <div class="card" id="card">
                             @if($value->path !== null)
                                 <img src="{{ asset("images/" . $value->path) }}" class="card-img-top"
                                      alt="...">
                             @else
-                                <img src="{{ asset("images/no_image/no_image.jpg") }}" class="card-img-top"
-                                     alt="...">
+                                <img src="{{ asset("images/no_image/no_image.jpg") }}" class="card-img-top">
                             @endif
-                            <div id="card-body">
+                            <div id="card-body" class="card-body">
                                 <div style="float: left; opacity: .6; ">
                                     @for($i = 0; $i < $value ->capacity; $i++)
                                         <i class="fa fa-user"></i>
@@ -54,9 +57,9 @@
                                     @endif
                                 </div>
                             </div>
-                            <div id="card-footer">
+                            <div id="card-footer" class="card-footer">
                                 <button class="btn btn-outline-success"
-                                        onclick="window.location.href = '{{route('object.view', ['id'=>$value ->id])}}';">
+                                        onclick="window.location.href = '{{route('object.view', ['id'=>$value->id])}}';">
                                     Подробнее
                                 </button>
                             </div>

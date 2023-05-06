@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Route::post('/add_session', 'FrontController@addSession')->name('add.session');
-Route::get('/', 'FrontController@front')->name('front')/*->middleware('admin')*/;
+Route::get('/', 'FrontController@front')->name('front')/*->middleware('admin')*/
+;
 
 
 Route::post('/add_img', 'ImageController@add')->name('add.img')->middleware('auth');
@@ -24,8 +25,9 @@ Route::any('/upload_img/id{id}', 'ImageController@uploadDrop')->name('upload.img
 Route::any('/delete_img', 'ImageController@deleteDrop')->name('delete.img')->middleware('auth');
 
 Route::get('/id{id}', 'ObjectController@view')->name('object.view');
-Route::match(['get', 'post'],'/add_obj', 'ObjectController@add')->name('object.add')->middleware('auth');
-Route::match(['get', 'post'],'/edit_obj/id{id}', 'ObjectController@edit')->name('object.edit')->middleware('auth');
+Route::match(['get', 'post'], '/add_obj', 'ObjectController@add')->name('object.add')->middleware('auth');
+Route::match(['get', 'post'],'/add_obj', 'ObjectController@addAddress')->name('object.add_address')->middleware('auth');
+Route::match(['get', 'post'], '/edit_obj/id{id}', 'ObjectController@edit')->name('object.edit')->middleware('auth');
 Route::get('/delete_obj/id{id}', 'ObjectController@delete')->name('object.delete')->middleware('auth');
 Route::get('/update_location', 'ObjectController@updateLocation')->name('update.location');
 

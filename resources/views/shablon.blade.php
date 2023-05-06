@@ -28,6 +28,14 @@
 
 
 
+    @forelse ($users as $user)
+        <li>Имя юзера {{ $user->name }}</li>
+    @empty
+        <p>Нет юзеров</p>
+    @endforelse
+
+
+
     @push('scripts')
         <script src="{{ asset('js/fecha.min.js') }}" defer></script>
         <link href="{{ asset('css/hotel-datepicker.css') }}" rel="stylesheet">

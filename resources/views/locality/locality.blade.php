@@ -14,7 +14,6 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 
-
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -79,20 +78,9 @@
             </div>
         </div>
     </nav>
-<style>
-    select{
-        padding: 10px;
-        border-radius: 5px;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        overflow: hidden;
-    }
-    select::-ms-expand {
-        display: none; /* удалите стрелку по умолчанию в IE 10 и 11 */
-    }
-</style>
+
     <main class="py-4">
+        <script src="{{asset('js/preloader/preloader.js')}}"></script>
         <div class="container mt-4" style="white-space: nowrap">
             <div class="card">
                 <div class="card-body" style="background-color: cadetblue;">
@@ -105,7 +93,8 @@
                                         <input id="value" type="text" value="" placeholder="Начните вводить город">
                                     </div>
 
-                                    <button style="background-color: #50898b" class="main-search-button">Применить</button>
+                                    <button style="background-color: #50898b" class="main-search-button">Применить
+                                    </button>
                                 </div>
                                 <br>
                                 <div id="dropdown" style="margin-top: 40px">

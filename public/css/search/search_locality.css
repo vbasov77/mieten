@@ -124,3 +124,15 @@ select#list {
         height: 80vh;
     }
 }
+
+select{
+    padding: 10px;
+    border-radius: 5px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    overflow: hidden;
+}
+select::-ms-expand {
+    display: none; /* удалите стрелку по умолчанию в IE 10 и 11 */
+}

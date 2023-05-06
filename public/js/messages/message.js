@@ -90,7 +90,7 @@ function checkNewMsg() {
 $('.messages').animate({scrollTop: $('.messages ul').height()}, "fast");
 
 function newMessage() {
-    var message = $('.message-input input').val();
+    var message = escapeHtml($('.message-input input').val());
     data = {
         "to_user_id": to_user_id,
         "from_user_id": from_user_id,
@@ -107,7 +107,6 @@ function newMessage() {
         dataType: 'json',
         success: function (res) {
             arrayId.push(res.id);
-            console.log(arrayId);
             let date = new Date(res.date);
             if ($.trim(message) == '') {
                 message = $('.message-input .emoji-wysiwyg-editor').html();
@@ -119,7 +118,8 @@ function newMessage() {
 <div id="` + res.id + `" data-id="` + res.id + `" style="float: right; font-size: 17px; background-color: #dad6f5; " class="messageBlock">
 <div class="round-popup">
 <button data-id="` + res.id + `" type="button" class="close"
-                                            aria-label="Close"><span aria-hidden="true">&times;</span></button> </div>               ${res.body}<br>
+                                            aria-label="Close"><span aria-hidden="true">&times;</span></button> </div>
+${res.body}<br>
                 <small  style="font-size: 10px" class="mb-0 text-left">${date.toLocaleString()}</small >
                 </div></div></li>`).appendTo($('.messages ul'));
             $('.message-input input').val('');

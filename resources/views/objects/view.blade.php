@@ -119,18 +119,21 @@
             <div id="map" style="width: 100%; height: 400px"></div>
         </div>
     </section>
-    <section>
-        <div class="row justify-content-center text-center">
-            @if(!empty(Auth::user()->id ) == $data->user_id)
-                <div>
-                    <button class="btn btn-success btn-sm" style="color: white; margin-top: 25px"
-                            onclick="window.location.href = '{{route('object.edit', ['id'=>$data->id])}}'">
-                        Редактировать номер
-                    </button>
-                </div>
-            @endif
-        </div>
-    </section>
+    @guest
+    @else
+        <section>
+            <div class="row justify-content-center text-center">
+                @if(Auth::user()->id == $data->user_id)
+                    <div>
+                        <button class="btn btn-success btn-sm" style="color: white; margin-top: 25px"
+                                onclick="window.location.href = '{{route('object.edit', ['id'=>$data->id])}}'">
+                            Редактировать бъект
+                        </button>
+                    </div>
+                @endif
+            </div>
+        </section>
+    @endguest
     @push('scripts')
         <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
         <script>
