@@ -33,23 +33,61 @@
                         <br>
                         <div>
                             <label for="price"><b>Цена:</b></label>
-                            <input name="price" type="text" value="{{$obj->price ?? old('price') }}"
+                            <input name="price" type="number" value="{{$obj->price ?? old('price') }}"
                                    class="form-control"
-                                   onkeypress="return (event.charCode >= 48 && event.charCode <= 57 && /^\d{0,3}$/.test(this.value));"
+                                   onkeypress="return (event.charCode >= 48 && event.charCode <= 57 && /^\d{0,8}$/.test(this.value));"
                                    placeholder="Цена" autocomplete="off" required>
                         </div>
                         <br>
+                        <div>
+                            <label for="area"><b>Общая площадь:</b></label>
+                            <input id="area" name="area" type="text" value="{{$obj->area ?? old('area') }}"
+                                   onkeyup="return checkСommas(this);"
+                                   class="form-control"
+                                   placeholder="Общая площадь" autocomplete="off" required>
+                        </div>
+                        <br>
+                        <div>
+                            <label for="floor"><b>Этаж:</b></label>
+                            <input name="floor" type="number" value="{{$obj->floor ?? old('floor') }}"
+                                   onkeypress="return (event.charCode >= 48 && event.charCode <= 57 && /^\d{0,3}$/.test(this.value));"
+                                   class="form-control"
+                                   placeholder="Этаж" autocomplete="off" required>
+                        </div>
+                        <br>
 
+                        <label class="checkbox-btn2">
+                            <input type="checkbox" name="balcony[]"
+                                   @php
+                                       if (in_array("балкон", $balcony)) {
+                                           echo 'checked';
+
+                                       }@endphp
+                                   value="балкон">
+                            <span>Балкон</span>
+                        </label>
+                        <label class="checkbox-btn2">
+                            <input type="checkbox" name="balcony[]"
+                                   @php
+                                       if (in_array("лоджия", $balcony)) {
+                                           echo 'checked';
+
+                                       }@endphp
+                                   value="лоджия">
+                            <span>Лоджия</span>
+                        </label>
+                        <br>
+                        <br>
                         <div>
                             <label for="rooms"><b>Количество комнат:</b></label><br>
                             <label class="checkbox-btn2">
                                 <input type="checkbox" name="count_rooms" id="rooms"
                                        value="студия"
-                                @php
-                                    if ($obj->count_rooms === "студия") {
-                                        echo 'checked';
+                                        @php
+                                            if ($obj->count_rooms === "студия") {
+                                                echo 'checked';
 
-                                    }@endphp>
+                                            }@endphp>
                                 <span>Студия</span>
                             </label>
 
@@ -60,12 +98,7 @@
                                    placeholder="Количество комнат" autocomplete="off" required>
                         </div>
                         <br>
-                        <div>
-                            <label for="text_room"><b>Текст:</b></label><br>
-                            <textarea class="form-control" placeholder="Введите текст..." name="text_room" id="text"
-                                      rows="5" cols="85"> {{$obj->text_obj?? old('text_obj')}}</textarea><br>
-                        </div>
-                        <br>
+
                         <div>
                             <label for="capacity"><b>Вместимость(человек):</b></label>
                             <input name="capacity" type="number" value="{{$obj->capacity ?? old('capacity') }}"
@@ -77,65 +110,15 @@
 
                         {{--                        Чекбоксы                                             --}}
 
-                        <label for="service"><b>Сервис:</b></label><br>
-                        <label class="checkbox-btn2">
-                            <input type="checkbox" name="service[]"
-                                   @php
-                                       if (in_array("телевизор", $service)) {
-                                           echo 'checked';
-
-                                       }@endphp
-                                   value="телевизор">
-                            <span>Телевизор</span>
-                        </label>
-
-                        <label class="checkbox-btn2">
-                            <input type="checkbox" name="service[]"
-                                   @php
-                                       if (in_array("фен", $service)) {
-                                           echo 'checked';
-
-                                       }@endphp
-                                   value="фен">
-                            <span>фен</span>
-                        </label>
-
-                        <label class="checkbox-btn2">
-                            <input type="checkbox" name="service[]"
-                                   @php
-                                       if (in_array("утюг", $service)) {
-                                           echo 'checked';
-
-                                       }@endphp
-                                   value="утюг">
-                            <span>утюг</span>
-                        </label>
-
-                        <label class="checkbox-btn2">
-                            <input type="checkbox" name="service[]"
-                                   @php
-                                       if (in_array("холодильник", $service)) {
-                                           echo 'checked';
-
-                                       }@endphp
-                                   value="холодильник">
-                            <span>холодильник</span>
-                        </label>
-
-                        <label class="checkbox-btn2">
-                            <input type="checkbox" name="service[]"
-                                   @php
-                                       if (in_array("кондиционер", $service)) {
-                                           echo 'checked';
-
-                                       }@endphp
-                                   value="кондиционер">
-                            <span>кондиционер</span>
-                        </label>
-                        <br>
+                        @include('objects/blocks/service')
                         <br>
 
-
+                        <div>
+                            <label for="text_room"><b>Текст:</b></label><br>
+                            <textarea class="form-control" placeholder="Введите текст..." name="text_room" id="text"
+                                      rows="5" cols="85"> {{$obj->text_obj?? old('text_obj')}}</textarea><br>
+                        </div>
+                        <br>
                         <div>
                             <label for="video"><b>Видео:</b></label>
                             <input name="video" type="text" value="{{$obj->path ?? old('video') }}"
@@ -164,7 +147,7 @@
                         <a onClick="return confirm('Подтвердите удаление!')"
                            href='{{route('object.delete', ['id' => $obj->id])}}' type='button'
                            class='btn btn-danger' style="margin: 5px">Удалить</a>
-                        <img src="{{ asset('images/loader/Dual.gif') }}" width="80px" height="auto" alt=""
+                        <img src="{{ asset('images/loader/preloader.svg') }}" width="35px" height="auto" alt=""
                              class="preloader-img"/>
                     </form>
 
@@ -190,8 +173,9 @@
             }
         </script>
         <script src="{{ asset('dropzone/edit.js') }}" defer></script>
-
         <script src="{{ asset('js/checkbox/checkbox.js') }}" defer></script>
+        <script src="{{ asset('js/checkСommas/checkСommas.js') }}" defer></script>
+
 
     @endpush
 @endsection

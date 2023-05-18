@@ -11,7 +11,7 @@
         @isset($title)
             {{ $title }} |
         @endisset
-            {{ config('app.name') }}
+        {{ config('app.name') }}
     </title>
 
     <!-- Scripts -->
@@ -19,7 +19,7 @@
 
 
     <!-- Fonts -->
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    {{--    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">--}}
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
@@ -51,12 +51,15 @@
                     <!-- Authentication Links -->
                     @php
 
-                    @endphp
+                            @endphp
                     @if(!empty(session('localityName')))
 
                         <a class="nav-link"
                            onClick="return confirm('Хотите изменить местоположение?')"
-                           href="{{ route('update.location') }}"><i style="margin-right: 5px" class="fa fa-map-marker" aria-hidden="true"></i>{{ session('localityName')}}</a>
+                           href="{{ route('update.location') }}"><img
+                                    src="{{ asset('icons/map.svg') }}"
+                                    style="width: 19px; height: auto; margin-bottom: 3px; margin-right: 3px"
+                            >{{ session('localityName')}}</a>
                     @endif
                     @guest
                         <li class="nav-item">
@@ -75,6 +78,7 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{route('my.objects')}}">Мои объекты</a>
                                 <a class="dropdown-item" href="{{route('object.add_address')}}">Добавить объект</a>
                                 <a class="dropdown-item" href="{{route('my.messages')}}">Мои сообщения</a>
                                 <a class="dropdown-item" href="{{ route('logout') }}"
@@ -93,7 +97,9 @@
             </div>
         </div>
     </nav>
+
     <main class="py-4">
+        @stack('css')
         @yield('content')
     </main>
 </div>

@@ -40,11 +40,22 @@ class ObjectController extends Controller
         return view('sorry.sorry', ['message' => $message]);
     }
 
+    public function myObjects()
+    {
+        $data =
+            DB::select("select o.id, o.address, o.published, d.title, d.price, d.count_rooms, d.capacity,
+   (select i.path from images i where obj_id = o.id order by i.id limit 1) path
+from objects o left join addresses a on o.id = a.obj_id left join details d on o.id = d.obj_id where o.user_id = "
+                . Auth::user()->id);
+        return view('objects.my', ['data' => $data]);
+    }
+
     public function addAddress(Request $request)
     {
         if ($request->isMethod('get')) {
             // этот код выполнится, если используется метод GET
-            return view('objects.add_address');
+            !empty($request->message) ? $message = $request->message : $message = null;
+            return view('objects.add_address', ['message' => $message]);
         }
         if ($request->isMethod('post')) {
             // этот код выполнится, если используется метод POST
@@ -55,8 +66,14 @@ class ObjectController extends Controller
                 'user_id' => Auth::user()->id,
                 'address' => $request->address,
             ]);
-            self::getAddress($request->address, $id);
-            return redirect()->action('ObjectController@edit', ['id' => $id]);
+            $address = self::getAddress($request->address, $id);
+            if (!empty($address)) {
+                return redirect()->action('ObjectController@edit', ['id' => $id]);
+            } else {
+                Obj::where('id', $id)->delete();
+                $message = 'Мы не нашли такого адреса, попробуйте снова. Следуйте подсказкам выпадающего списка';
+                return redirect()->action('ObjectController@addAddress', ['message' => $message]);
+            }
 
         }
     }
@@ -69,12 +86,32 @@ class ObjectController extends Controller
             $obj = Obj::
             leftJoin('addresses', 'objects.id', '=', 'addresses.obj_id')
                 ->leftJoin('video', 'objects.id', '=', 'video.obj_id')
+                ->leftJoin('details', 'objects.id', '=', 'details.obj_id')
                 ->where('objects.id', $request->id)
-                ->get(['objects.*', 'addresses.address', 'video.path']);
+                ->get([
+                    'objects.*',
+                    'addresses.address',
+                    'video.path',
+                    'details.title',
+                    'details.price',
+                    'details.capacity',
+                    'details.count_rooms',
+                    'details.service',
+                    'details.text_obj',
+                    'details.floor',
+                    'details.balcony',
+                    'details.area',
+                ]);
             $images = Image::where('obj_id', $request->id)->pluck('path');
             $service = explode(',', $obj[0]->service);
+            $balcony = explode(',', $obj[0]->balcony);
             if (isset($obj)) {
-                return view('objects.edit', ['obj' => $obj[0], 'images' => $images, 'service' => $service]);
+                return view('objects.edit', [
+                    'obj' => $obj[0],
+                    'images' => $images,
+                    'service' => $service,
+                    'balcony' => $balcony,
+                ]);
             }
             $message = "Скорее всего объект был удалён...";
             return view('sorry.sorry', ['message' => $message]);
@@ -87,6 +124,7 @@ class ObjectController extends Controller
                 if (isset($request->service)) {
                     $service = (string)implode(',', $request->service);
                 }
+                isset($request->balcony) ? $balcony = implode(',', $request->balcony) : null;
                 $obj = Detail::where('obj_id', $request->id)->first();
                 if (isset($obj)) {
                     Detail::where('obj_id', $request->id)->update([
@@ -96,6 +134,9 @@ class ObjectController extends Controller
                         'count_rooms' => $request->count_rooms,
                         'capacity' => $request->capacity,
                         'service' => $service,
+                        'floor' => $request->floor,
+                        'balcony' => $balcony,
+                        'area' => (float)$request->area,
                     ]);
                     if ($_POST['video'] !== '') {
                         $video = Video::where('obj_id', $request->id)->get();
@@ -120,6 +161,9 @@ class ObjectController extends Controller
                         'count_rooms' => $request->count_rooms,
                         'capacity' => $request->capacity,
                         'service' => $service,
+                        'floor' => $request->floor,
+                        'balcony' => $balcony,
+                        'area' => (float)$request->area,
                     ]);
                     $res = ['answer' => 'ok'];
                 }
@@ -143,11 +187,12 @@ class ObjectController extends Controller
         }
         Image::where('obj_id', $request->id)->delete();
         Detail::where('obj_id', $request->id)->delete();
-
+        return redirect()->action('ObjectController@myObjects');
     }
 
     public function updateLocation(Request $request)
     {
+        $request->session()->forget('localityName');
         $request->session()->forget('locality');
         $request->session()->save();
         return redirect()->action('FrontController@front');
@@ -165,30 +210,48 @@ class ObjectController extends Controller
         $res = curl_exec($ch);
         curl_close($ch);
         $response = json_decode($res, true);
-        $coordinatesStr = $response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'];
-        $coordinatesArr = explode(' ', $coordinatesStr);
-        $coordinates = $coordinatesArr[1] . ', ' . $coordinatesArr[0];
 
-        Coordinates::insert(['obj_id' => $objId, 'coordinates' => $coordinates]);
+        if (empty($response['response']['GeoObjectCollection']['featureMember'])) {
+            return null;
+        } else {
+            $coordinatesStr = $response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'];
+            $coordinatesArr = explode(' ', $coordinatesStr);
+            $coordinates = $coordinatesArr[1] . ', ' . $coordinatesArr[0];
+            Coordinates::insert(['obj_id' => $objId, 'coordinates' => $coordinates]);
+            $object = $response['response']['GeoObjectCollection']
+            ['featureMember'][0]['GeoObject']['metaDataProperty']
+            ['GeocoderMetaData']['Address']['Components'];
 
-        $object = $response['response']['GeoObjectCollection']
-        ['featureMember'][0]['GeoObject']['metaDataProperty']
-        ['GeocoderMetaData']['Address']['Components'];
+
+            $countryId = self::getCountryId($object);
+            $localityId = self::getLocalityId($object, $countryId);
+            $address = [];
+            $address[] = self::getAddressName($object, "street");
+            $address[] = self::getAddressName($object, "house");
+            $address = implode(',', $address);
+
+            Address::insert(['obj_id' => $objId, 'country' => $countryId, 'locality' => $localityId, 'address' => $address]);
+            return true;
+        }
 
 
-        $countryId = self::getCountryId($object);
-        $localityId = self::getLocalityId($object, $countryId);
-        $address = [];
-        $address[] = self::getAddressName($object, "street");
-        $address[] = self::getAddressName($object, "house");
-        $address = implode(',', $address);
+    }
 
-        Address::insert(['obj_id' => $objId, 'country' => $countryId, 'locality' => $localityId, 'address' => $address]);
+    public function takeOff(Request $request)
+    {
+        Obj::where('id', $request->id)->update(['published' => 0]);
+        return back();
+    }
 
+    public function publishObj(Request $request)
+    {
+        Obj::where('id', $request->id)->update(['published' => 1]);
+        return back();
     }
 
     public static function getLocalityId(array $object, int $country_id)
     {
+
         for ($i = 0; $i < count($object); $i++) {
             if ($object[$i]['kind'] === "locality") {
                 $data = $object[$i]['name'];
@@ -210,7 +273,8 @@ class ObjectController extends Controller
 
     public static function getCountryId(array $object)
     {
-        for ($i = 0; $i < count($object); $i++) {
+        $count = count($object);
+        for ($i = 0; $i < $count; $i++) {
             if ($object[$i]['kind'] === "country") {
                 $data = $object[$i]['name'];
                 $check = Country::where("country", $data)->first();
@@ -230,7 +294,8 @@ class ObjectController extends Controller
 
     public static function getAddressName(array $object, string $component)
     {
-        for ($i = 0; $i < count($object); $i++) {
+        $count = count($object);
+        for ($i = 0; $i < $count; $i++) {
             if ($object[$i]['kind'] === $component) {
                 return $object[$i]['name'];
             }
@@ -241,7 +306,8 @@ class ObjectController extends Controller
     {
         $images = explode(',', $images);
         $data = "";
-        for ($i = 0; $i < count($images); $i++) {
+        $count = count($images);
+        for ($i = 0; $i < $count; $i++) {
             $more = "(" . $obj_id . ", '" . $images[$i] . "'),";
             $data = $data . $more;
         }

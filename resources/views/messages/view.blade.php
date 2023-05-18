@@ -2,12 +2,20 @@
 @section('content')
     <link href="{{ asset('css/messages.css') }}" rel="stylesheet">
     <style>
+        .rem {
+            opacity: 0.5;
+        }
+
+        .rem:hover {
+            opacity: 1;
+        }
     </style>
     <section>
         <div class="container px-4 px-lg-5"
              style="white-space: nowrap"> {{--Запрет переноса строк при уменьшении странцы браузера--}}
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-lg-8">
+
                     @csrf
                     <div style="margin-top: 10px" id="framechat">
                         <div class="content">
@@ -30,20 +38,32 @@
                                                 >
                                             @endif
                                         </a>
+
                                         <div class="infoBlock">
                                             <b>{!! $data[0]->user_name !!}</b><br>
                                             <small>
                                                 <div class="iconsSmall">
-                                                    <img src="{{ asset('icons/location-map-marker-navigation.svg') }}"
-                                                         style="width: 20px; height: auto"
+                                                    <img src="{{ asset('icons/map.svg') }}"
+                                                         style="width: 19px; margin: 0px 3px 7px 0"
                                                     ></div>{!! $data[0]->address !!}</small>
                                         </div>
+                                        @if(!empty($messages))
+                                            <a style="text-decoration: none;" title="Удалить чат"
+                                               onClick="return confirm('Подтвердите удаление чата!')"
+                                               href="{{ route('delete.chat', ['to_user_id' => $toUser,
+                                       'from_user_id' =>$userId, 'obj_id'=> $messages[0]->obj_id]) }}">
+                                                <img class="imgMsg rem"
+                                                     src="{{ asset('icons/del_message.svg') }}"
+                                                     style="width: auto; height: 25px; float: right; border: none;"
+                                                >
+                                            </a>
+                                        @endif
                                     </div>
                                 @else
                                     <div class="msgImg">
                                         <img class="imgMsg"
-                                             src="{{ asset('icons/account.svg') }}"
-                                             style="width: auto; height: 60px"
+                                             src="{{ asset('icons/no-entry.svg') }}"
+                                             style="width: auto; height: 40px; border: none"
                                         >
                                         <div class="infoBlock">
                                             Объект удалён
@@ -85,30 +105,42 @@
                                     @endfor
                                 </ul>
                             </div>
-                            <div class="message-input">
+                            @if (!empty($data))
+                                <div class="message-input">
 
-                                <div class="wrap">
-                                    @if (!empty($data))
+                                    <div class="wrap">
+
                                         <input class="form-control" type="text" placeholder="Ваше сообщение..."/>
                                         <button class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i>
                                         </button>
-                                    @endif
-                                </div>
 
-                            </div>
+                                    </div>
+
+                                </div>
+                            @else
+                                <div class="text-center">
+                                    <a class="btn btn-outline-danger btn-sm"
+                                       onClick="return confirm('Подтвердите удаление!')"
+                                       href="{{ route('delete.chat', ['to_user_id' => $toUser,
+                                       'from_user_id' =>$userId, 'obj_id'=> $messages[0]->obj_id]) }}">Удалить чат
+                                    </a>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    @push('scripts')
-        <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-        <script>
-            var to_user_id = @json($toUser);
-            var from_user_id = @json($userId);
-            var obj_id = @json($data[0]->id);
-        </script>
-        <script src="{{asset('js/messages/message.js')}}"></script>
-    @endpush
+    @if (!empty($data))
+        @push('scripts')
+            <script src="{{ asset('js/jquery/jquery-3.5.1.js') }}"></script>
+            <script>
+                var to_user_id = @json($toUser);
+                var from_user_id = @json($userId);
+                var obj_id = @json($objId);
+            </script>
+            <script src="{{asset('js/messages/message.js')}}"></script>
+        @endpush
+    @endif
 @endsection

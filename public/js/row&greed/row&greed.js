@@ -6,6 +6,42 @@ var cardFooter = document.getElementById("card-footer");
 // cardBody.className = cardBodyName;
 // cardFooter.className = cardFooterName;
 
+
+$(document).ready(function () {
+    function checkWidth() {
+        const windowWidth = window.innerWidth;
+        if (windowWidth < 700 ) {
+            document.getElementById("btnContainer").style.display = 'none';
+            document.querySelectorAll('.rowM').forEach(el => el.className = 'card');
+            document.querySelectorAll('.rowM-body').forEach(el => el.className = 'card-body');
+            document.querySelectorAll('.rowM-footer').forEach(el => el.className = 'card-footer');
+            const data = {
+                'cardName': 'card',
+                'cardBodyName': 'card-body',
+                'cardFooterName': 'card-footer',
+            };
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '/add_session',
+                type: 'POST',
+                data: data,
+                dataType: "html", //формат данных
+            });
+        } else {
+            document.getElementById("btnContainer").style.display = 'block';
+        }
+
+    }
+
+    checkWidth(); // проверит при загрузке страницы
+
+    $(window).resize(function () {
+        checkWidth(); // проверит при изменении размера окна клиента
+    });
+});
+
 document.querySelectorAll('.card').forEach(el => el.className = cardName);
 document.querySelectorAll('.card-body').forEach(el => el.className = cardBodyName);
 document.querySelectorAll('.card-footer').forEach(el => el.className = cardFooterName);
@@ -33,6 +69,7 @@ function rowM() {
 
 
 function cardM() {
+
     document.querySelectorAll('.rowM').forEach(el => el.className = 'card');
     document.querySelectorAll('.rowM-body').forEach(el => el.className = 'card-body');
     document.querySelectorAll('.rowM-footer').forEach(el => el.className = 'card-footer');
@@ -50,4 +87,5 @@ function cardM() {
         data: data,
         dataType: "html", //формат данных
     });
+
 }

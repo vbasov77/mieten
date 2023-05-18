@@ -1,6 +1,5 @@
 @extends('layouts.app')
 @section('content')
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <section>
         <div class="container px-4 px-lg-5">
             <div class="row  justify-content-center text-center">
@@ -50,7 +49,9 @@
                 <div class="col-xl-4">
                     @if (!empty($data['price']))
                         <div style="font-size: 30px; margin-bottom: 15px; opacity: .7; margin-top: 45px; ">
-                            <b> От {{ $data ['price'] }} <i class="fa fa-rub"></i></b>
+                            <b> От {{ $data ['price'] }} <img src="{{ asset('icons/ruble.svg') }}"
+                                                              style="margin-bottom: 5px; width: 30px; height: auto"
+                                ></b>
                         </div>
                     @endif
                     @if (!empty($data['service'])  )
@@ -61,7 +62,9 @@
 
                         @foreach($service as $value)
                             <div style="font-size: 23px;">
-                                <i class="fa fa-check"></i> {{$value }}<br>
+                                <img src="{{ asset('icons/check.svg') }}"
+                                     style="margin-bottom: 5px; width: 30px; height: auto"
+                                > {{$value }}<br>
                             </div>
                         @endforeach
 
@@ -77,12 +80,18 @@
                         Написать сообщение
                     </button>
                     <div style="margin: 50px 0 50px 0">
-                        <h1><i class="fa fa-map-marker" aria-hidden="true"></i> {{$data->address}}</h1>
+                        <h1><img src="{{ asset('icons/map.svg') }}"
+                                 style="margin: 0 5px 10px 0px; width: 30px; height: auto"
+                            >{{$data->address}}</h1>
                         Количество комнат: {{$data -> count_rooms}}<br>
-                        Вместимость до:
-                        @for($i = 0; $i < $data->capacity; $i++)
-                            <i class="fa fa-user"></i>
-                        @endfor
+                        <container>
+                            Вместимость до:
+                            {!! $data->capacity !!}
+
+                            <img src="{{ asset('icons/user.svg') }}"
+                                 style="margin-bottom: 5px; width: 15px; height: auto"
+                            >
+                        </container>
 
                     </div>
                 </div>

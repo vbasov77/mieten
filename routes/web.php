@@ -24,8 +24,10 @@ Route::get('/del_session', 'ImageController@delSession')->name('del.session')->m
 Route::any('/upload_img/id{id}', 'ImageController@uploadDrop')->name('upload.img')->middleware('auth');
 Route::any('/delete_img', 'ImageController@deleteDrop')->name('delete.img')->middleware('auth');
 
-Route::get('/id{id}', 'ObjectController@view')->name('object.view');
-Route::match(['get', 'post'], '/add_obj', 'ObjectController@add')->name('object.add')->middleware('auth');
+Route::get('/id{id}', 'ObjectController@view')->name('object.view') ;
+Route::get('/take_off{id}', 'ObjectController@takeOff')->name('object.take_off')->middleware('auth');;
+Route::get('/publish{id}', 'ObjectController@publishObj')->name('object.publish')->middleware('auth');;
+Route::get('/my_objects', 'ObjectController@myObjects')->name('my.objects')->middleware('auth');;
 Route::match(['get', 'post'],'/add_obj', 'ObjectController@addAddress')->name('object.add_address')->middleware('auth');
 Route::match(['get', 'post'], '/edit_obj/id{id}', 'ObjectController@edit')->name('object.edit')->middleware('auth');
 Route::get('/delete_obj/id{id}', 'ObjectController@delete')->name('object.delete')->middleware('auth');
@@ -35,6 +37,7 @@ Route::get('/messages', 'MessageController@myMessages')->name('my.messages')->mi
 Route::get('/message{id}', 'MessageController@view')->name('view.messages')->middleware('auth');
 Route::post('/add_message', 'MessageController@add')->name('add.message')->middleware('auth');
 Route::get('/delete_message', 'MessageController@deleteMsg')->name('delete.message')->middleware('auth');
+Route::get('/delete_chat', 'MessageController@deleteChat')->name('delete.chat')->middleware('auth');
 Route::post('/check_message', 'MessageController@checkNewMsg')->name('check.message')->middleware('auth');
 Route::post('/notified', 'MessageController@notified')->name('notified.message')->middleware('auth');
 
@@ -57,3 +60,8 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 
 
+Route::get('ip', function () {
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $data = \Location::get($ip);
+    dd($data);
+});
