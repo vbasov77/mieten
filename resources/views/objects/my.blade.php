@@ -67,7 +67,7 @@
 
             @media screen and (max-width: 1000px) {
                 .rowM {
-                    width: 18em;
+                    width: 16em;
 
                 }
 
@@ -97,9 +97,7 @@
             @media (max-width: 558px) {
                 .rowM {
                     width: 100%;
-
                 }
-
             }
 
             .lit {

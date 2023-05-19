@@ -13,7 +13,8 @@ class FrontController extends Controller
             return view('locality.locality');
         } else {
             $data =
-                DB::select("select o.id, o.address, d.title, d.price, d.count_rooms, d.capacity,
+                DB::select("select o.id, d.title, d.price, d.count_rooms, d.capacity,
+   (select a.address from addresses a where obj_id = o.id) address,
    (select i.path from images i where obj_id = o.id order by i.id limit 1) path
 from objects o left join addresses a on o.id = a.obj_id left join details d on o.id = d.obj_id 
 where a.locality = " . session('locality') . " and o.published = 1");
